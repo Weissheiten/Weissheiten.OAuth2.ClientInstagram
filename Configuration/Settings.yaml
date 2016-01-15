@@ -4,12 +4,12 @@ TYPO3:
       authentication:
         providers:
           InstagramOAuth2Provider:
-            provider: Flowpack\OAuth2\Client\Provider\InstagramProvider
+            provider: Weissheiten\OAuth2\ClientInstagram\Provider\InstagramProvider
             providerOptions:
               authorizationEndpointUri: 'https://api.instagram.com/oauth/authorize/'
               redirectionEndpointUri: 'https://www.wishbase.com/authentication/authenticate'
               tokenEndpointUri: 'https://api.instagram.com/oauth/access_token'
-              tokenEndpointClassName: Flowpack\OAuth2\Client\Endpoint\InstagramTokenEndpoint
+              tokenEndpointClassName: Weissheiten\OAuth2\ClientInstagram\Endpoint\InstagramTokenEndpoint
               clientIdentifier: 123456-your-client-identifier
               clientSecret: '-add-your-client-secret-here-'
               responseType: code
