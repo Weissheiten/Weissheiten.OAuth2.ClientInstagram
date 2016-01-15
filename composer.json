@@ -1,0 +1,20 @@
+{
+  "name":"weissheiten/oauth2-clientinstagram",
+  "description":"Instagram OAuth 2.0 authorization framework client for the web application framework TYPO3 Flow based on the interfaces of flowpack/oauth2-client.",
+  "keywords":["OAuth2", "TYPO3", "Flow", "Flowpack", "Client", "Instagram"],
+  "type":"typo3-flow-package",
+  "authors":[
+    {
+      "name":"Florian Weiss"
+    }
+  ],
+  "require":{
+    "typo3/flow": ">=2.1",
+    "flowpack/oauth2-client": "dev-master"
+  },
+  "autoload":{
+    "psr-0":{
+      "Weissheiten\\OAuth2\\ClientInstagram":"Classes/"
+    }
+  }
+}
