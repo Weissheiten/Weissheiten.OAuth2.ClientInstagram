@@ -7,14 +7,12 @@ TYPO3:
             provider: Weissheiten\OAuth2\ClientInstagram\Provider\InstagramProvider
             providerOptions:
               authorizationEndpointUri: 'https://api.instagram.com/oauth/authorize/'
-              redirectionEndpointUri: 'https://www.wishbase.com/authentication/authenticate'
+              redirectionEndpointUri: 'http://dev.neos/neos/administration/InstagramMedia'
               tokenEndpointUri: 'https://api.instagram.com/oauth/access_token'
               tokenEndpointClassName: Weissheiten\OAuth2\ClientInstagram\Endpoint\InstagramTokenEndpoint
-              clientIdentifier: 123456-your-client-identifier
-              clientSecret: '-add-your-client-secret-here-'
+              clientIdentifier: '--clientID--'
+              clientSecret: '--clientSecret--'
               responseType: code
               scopes:
-                - email
-                - user_location
-                - user_birthday
-              display: popup
+                - basic
+              display: basic
