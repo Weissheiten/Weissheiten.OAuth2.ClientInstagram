@@ -26,6 +26,11 @@ class InstagramProvider extends AbstractClientProvider {
      */
     public function authenticate(TokenInterface $authenticationToken)
     {
+        if (!($authenticationToken instanceof AbstractClientToken)) {
+            throw new UnsupportedAuthenticationTokenException('This provider cannot authenticate the given token.', 1383754993);
+        }
+        // Dev Version - set Standard to AuthenticationNeeded
+        $authenticationToken->setAuthenticationStatus(TokenInterface::AUTHENTICATION_NEEDED);
     }
 
     /**

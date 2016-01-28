@@ -7,7 +7,7 @@ TYPO3:
             provider: Weissheiten\OAuth2\ClientInstagram\Provider\InstagramProvider
             providerOptions:
               authorizationEndpointUri: 'https://api.instagram.com/oauth/authorize/'
-              redirectionEndpointUri: 'http://dev.neos/neos/administration/InstagramMedia'
+              redirectionEndpointUri: 'http://dev.neos/authentication/authenticateInstagram'
               tokenEndpointUri: 'https://api.instagram.com/oauth/access_token'
               tokenEndpointClassName: Weissheiten\OAuth2\ClientInstagram\Endpoint\InstagramTokenEndpoint
               clientIdentifier: '--clientID--'
