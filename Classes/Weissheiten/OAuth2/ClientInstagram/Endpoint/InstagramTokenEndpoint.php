@@ -25,6 +25,7 @@ class InstagramTokenEndpoint extends AbstractHttpTokenEndpoint implements TokenE
      * @var SecurityLoggerInterface
      */
     protected $securityLogger;
+
     /**
      * Inspect the received access token
      *
@@ -32,18 +33,48 @@ class InstagramTokenEndpoint extends AbstractHttpTokenEndpoint implements TokenE
      * @return array
      * @throws OAuth2Exception
      */
-    public function requestValidatedTokenInformation($tokenToInspect) {
-        return [];
-    }
-    /**
-     * @param $shortLivedToken
-     * @return string
-     */
-    public function requestLongLivedToken($shortLivedToken) {
-        return $this->requestAccessToken('instagram_exchange_token', array('instagram_exchange_token' => $shortLivedToken));
+    public function validateSecureRequestCapability($accessToken) {
+        $requestArguments = array(
+            'access_token' => $accessToken
+        );
+        $requestArguments['sig'] = $this->generate_sig($requestArguments);
+
+        // test the secure API call by getting information of the own user - scope: basic (also available in sandbox mode)
+        $request = Request::create(new Uri('https://api.instagram.com/v1/users/self/?' . http_build_query($requestArguments)));
+        $response = $this->requestEngine->sendRequest($request);
+        $responseContent = $response->getContent();
+
+        if ($response->getStatusCode() !== 200) {
+            throw new OAuth2Exception(sprintf('The response was not of type 200 but gave code and error %d "%s"', $response->getStatusCode(), $responseContent), 1455261376);
+        }
+
+        $responseArray = json_decode($responseContent,true);
+        $responseData = $responseArray['data'];
+
+        // at least ID and Username are mandatory
+        if(!isset($responseData['id']) || !isset($responseData['username'])){
+            return FALSE;
+        }
+
+        return $responseData;
     }
 
-    // This function should not be necessary - problem is decoding the response tailored for facebook in original package
+    /**
+     * Generate a sig for secure API calls
+     *
+     * @param $params
+     * @return string
+     */
+    private function generate_sig($params) {
+        $sig = $this->endpointUri;
+        ksort($params);
+        foreach ($params as $key => $val) {
+            $sig .= "|$key=$val";
+        }
+        return hash_hmac('sha256', $sig, $this->clientSecret, false);
+    }
+
+    // This function should not be necessary - problem is decoding the response tailored for facebook in original package, we need to json_decode here
     /**
      * @param string $grantType One of this' interface GRANT_TYPE_* constants
      * @param array $additionalParameters Additional parameters for the request
@@ -61,15 +92,14 @@ class InstagramTokenEndpoint extends AbstractHttpTokenEndpoint implements TokenE
 
         $request = Request::create(new Uri($this->endpointUri), 'POST', $parameters);
         $request->setHeader('Content-Type', 'application/x-www-form-urlencoded');
+
         $response = $this->requestEngine->sendRequest($request);
 
         if ($response->getStatusCode() !== 200) {
             throw new OAuth2Exception(sprintf('The response when requesting the access token was not as expected, code and message was: %d %s', $response->getStatusCode(), $response->getContent()), 1383749757);
         }
-        //parse_str($response->getContent(), $responseComponents);
-        $responseComponents = json_decode($response->getContent(),true);
 
-        // §§§ Continue here => actually returns the correct access token
+        $responseComponents = json_decode($response->getContent(),true);
 
         return $responseComponents['access_token'];
     }

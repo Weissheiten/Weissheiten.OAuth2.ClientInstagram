@@ -1,0 +1,11 @@
+privilegeTargets:
+  'TYPO3\Flow\Security\Authorization\Privilege\Method\MethodPrivilege':
+     'Weissheiten.Neos.InstagramMedia:AuthorizationActions':
+        matcher: 'method(Weissheiten\OAuth2\ClientInstagram\Controller\AuthenticationController->(.*)())'
+
+roles:
+  'TYPO3.Flow:Everybody':
+    privileges:
+      -
+        privilegeTarget: 'Weissheiten.Neos.InstagramMedia:AuthorizationActions'
+        permission: GRANT

@@ -19,7 +19,6 @@ use TYPO3\Party\Domain\Model\Person;
 use TYPO3\Party\Domain\Model\PersonName;
 use TYPO3\Party\Domain\Repository\PartyRepository;
 
-
 class InstagramFlow extends AbstractFlow implements FlowInterface{
     /**
      * @Flow\Inject
@@ -36,6 +35,19 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
      * @var PartyRepository
      */
     protected $partyRepository;
+
+    /**
+     * @var \TYPO3\Party\Domain\Service\PartyService
+     * @Flow\Inject
+     */
+    protected $partyService;
+
+    /**
+     * @var \TYPO3\Neos\Domain\Service\UserService
+     * @Flow\Inject
+     */
+    protected $userService;
+
     /**
      * @Flow\Inject
      * @var PolicyService
@@ -57,6 +69,39 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
      * @var array
      */
     protected $tokenForeignAccounts = array();
+
+    /**
+     * @param Account $account
+     * @return void
+     */
+    public function attachAccountToBackendParty(Account $account){
+        $user = $this->userService->getCurrentUser();
+        \TYPO3\Flow\var_dump($user);
+        \TYPO3\Flow\var_dump($account->getAccountIdentifier());
+        $user->addAccount($account);
+    }
+
+    /**
+     * @param Account $instagramAccount
+     * @return \TYPO3\Party\Domain\Model\AbstractParty;
+     */
+    public function verifyPartyForAccount(Account $instagramAccount){
+        if($this->partyService->getAssignedPartyOfAccount($instagramAccount)===NULL){
+            $this->attachAccountToBackendParty($instagramAccount);
+        }
+    }
+
+    /**
+     * @return \TYPO3\Flow\Security\Account
+     */
+    public function getInstagramAccountHavingParty(){
+        foreach($this->userService->getCurrentUser()->getAccounts() as $account){
+            if($account->getAuthenticationProviderName==='InstagramOAuth2Provider'){
+                return $account;
+            }
+        }
+        return NULL;
+    }
 
     /**
      * @param AbstractClientToken $token
@@ -81,6 +126,7 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
             if (!isset($this->authenticationServicesUserData[(string)$token])) {
                 $this->initializeUserData($token);
             }
+
             $this->tokenForeignAccounts[(string)$token] = $this->accountRepository->findOneByAccountIdentifier($this->authenticationServicesUserData[(string)$token]['email']);
         }
         return $this->tokenForeignAccounts[(string)$token];
@@ -94,7 +140,11 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
         $oauthAccount = $possibleOAuthTokenAuthenticatedWithoutParty->getAccount();
         // TODO: this must be properly specifiable (the Roles to add)
         #$oauthAccount->setRoles();
-        $oauthAccount->setParty($foreignAccountToken->getAccount()->getParty());
+
+        // deprecated Version
+        //$oauthAccount->setParty($foreignAccountToken->getAccount()->getParty());
+        // new implementation
+        $this->partyService->assignAccountToParty($oauthAccount,$this->partyService->getAssignedPartyOfAccount($foreignAccountToken));
         $this->accountRepository->update($oauthAccount);
     }
 
@@ -111,6 +161,7 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
         #$party->setGender(substr($userData['gender'], 0, 1));
         $electronicAddress = new ElectronicAddress();
         $electronicAddress->setType(ElectronicAddress::TYPE_EMAIL);
+
         $electronicAddress->setIdentifier($userData['email']);
         $party->addElectronicAddress($electronicAddress);
         $partyValidator = $this->validatorResolver->getBaseValidatorConjunction('TYPO3\Party\Domain\Model\Person');
@@ -119,6 +170,10 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
             throw new InvalidPartyDataException('The created party does not satisfy the requirements', 1384266207);
         }
         $account = $token->getAccount();
+
+        // assign the newly created party to the account
+        $this->partyService->assignAccountToParty($account,$party);
+
         $account->setParty($party);
         // TODO: this must be properly specifiable (the Roles to add)
         #$account->setRoles();
@@ -126,10 +181,21 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
         $this->partyRepository->add($party);
     }
 
+    /**
+     * Returns the access token of the according token
+     * @param AbstractClientToken $token
+     *
+     * @return string
+     */
+    public function getTokenUserData(AbstractClientToken $token){
+        if (!isset($this->authenticationServicesUserData[(string)$token])) {
+            $this->initializeUserData($token);
+        }
+        return $this->authenticationServicesUserData[(string)$token];
+    }
 
     /**
      * Returns the token class name this flow is responsible for
-     *
      * @return string
      */
     public function getTokenClassName() {
@@ -142,8 +208,8 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
     protected function initializeUserData(AbstractClientToken $token) {
         $credentials = $token->getCredentials();
         $this->instagramApiClient->setCurrentAccessToken($credentials['accessToken']);
-        $content = $this->instagramApiClient->query('/me')->getContent();
-        $this->authenticationServicesUserData[(string)$token] = json_decode($content, TRUE);
+        $content = $this->instagramApiClient->query('/users/self')->getContent();
+        $this->authenticationServicesUserData[(string)$token] = json_decode($content, TRUE)['data'];
     }
 
 }

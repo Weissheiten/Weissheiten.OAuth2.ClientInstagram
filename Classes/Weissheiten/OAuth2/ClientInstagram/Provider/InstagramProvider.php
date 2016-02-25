@@ -18,6 +18,30 @@ use TYPO3\Flow\Security\Exception\UnsupportedAuthenticationTokenException;
 class InstagramProvider extends AbstractClientProvider {
 
     /**
+     * @Flow\Inject
+     * @var SecurityLoggerInterface
+     */
+    protected $securityLogger;
+
+    /**
+     * @Flow\Inject
+     * @var \TYPO3\Flow\Security\AccountRepository
+     */
+    protected $accountRepository;
+
+    /**
+     * @Flow\Inject
+     * @var \TYPO3\Flow\Security\Context
+     */
+    protected $securityContext;
+
+    /**
+     * @Flow\Inject
+     * @var \Weissheiten\OAuth2\ClientInstagram\Endpoint\InstagramTokenEndpoint
+     */
+    protected $instagramTokenEndpoint;
+
+    /**
      * Tries to authenticate the given token. Sets isAuthenticated to TRUE if authentication succeeded.
      *
      * @param TokenInterface $authenticationToken The token to be authenticated
@@ -29,8 +53,46 @@ class InstagramProvider extends AbstractClientProvider {
         if (!($authenticationToken instanceof AbstractClientToken)) {
             throw new UnsupportedAuthenticationTokenException('This provider cannot authenticate the given token.', 1383754993);
         }
-        // Dev Version - set Standard to AuthenticationNeeded
-        $authenticationToken->setAuthenticationStatus(TokenInterface::AUTHENTICATION_NEEDED);
+
+        $credentials = $authenticationToken->getCredentials();
+
+        // There is no way to validate the Token or check the scopes at the moment apart from "trying" (and possibly receiving an access denied)
+        // we could check the validity of the Token and the scopes here in the future when Instagram provides that
+
+        // Only check if an access Token is present at this time and do a single test call
+        if(isset($credentials['accessToken']) && $credentials['accessToken']!==NULL){
+            // check if a secure request is possible (https://www.instagram.com/developer/secure-api-requests/)
+            $userInfo = $this->instagramTokenEndpoint->validateSecureRequestCapability($credentials['accessToken']);
+
+            if($userInfo===FALSE){
+                $authenticationToken->setAuthenticationStatus(TokenInterface::WRONG_CREDENTIALS);
+                $this->securityLogger->log('A secure call to the API with the provided accessToken and clientSecret was not possible', LOG_NOTICE);
+                return FALSE;
+            }
+        }
+
+        // From here, we surely know the user is considered authenticated against the remote service,
+        // yet to check if there is an immanent account present.
+        $authenticationToken->setAuthenticationStatus(TokenInterface::AUTHENTICATION_SUCCESSFUL);
+
+        /** @var $account \TYPO3\Flow\Security\Account */
+        $account = NULL;
+        $providerName = $this->name;
+        $accountRepository = $this->accountRepository;
+        $this->securityContext->withoutAuthorizationChecks(function() use ($userInfo, $providerName, $accountRepository, &$account) {
+            $account = $accountRepository->findByAccountIdentifierAndAuthenticationProviderName($userInfo['id'], $providerName);
+        });
+        if ($account === NULL) {
+            $account = new Account();
+            $account->setAccountIdentifier($userInfo['id']);
+            $account->setAuthenticationProviderName($providerName);
+            $this->accountRepository->add($account);
+        }
+
+        $authenticationToken->setAccount($account);
+        // the access token is valid for an "undefined time" according to instagram (so we cannot know when the user needs to log in again)
+        $account->setCredentialsSource($credentials['accessToken']);
+        $this->accountRepository->update($account);
     }
 
     /**
