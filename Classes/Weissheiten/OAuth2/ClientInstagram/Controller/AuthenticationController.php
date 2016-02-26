@@ -119,59 +119,47 @@ class AuthenticationController extends AbstractAuthenticationController {
                 $this->userRepository->update($user);
             }
             else{
-                //$this->onAuthenticationFailure(new AuthenticationRequiredException('Instagram Userdata could not be retrieved'));
                 $this->securityLogger->logException(new Exception("Could not retrieve UserData from Instagram in Weissheiten.Neos.InstagramMedia"));
             }
         }
         else{
-           // $OAuthTokenWithParty = $this->authenticationFlow->getChargedAuthenticatedTokenHavingPartyAttached();
-           // \TYPO3\Flow\var_dump($OAuthTokenWithParty);
-            /*
-            if($OAuthTokenWithParty!== NULL) {
-                  $OAuthTokenWithParty->setAccount();
-              }
-              else*/
-                try {
-                    if ($originalRequest !== NULL) {
-                        $requestToRedirect = $originalRequest;
-                    } elseif ($this->request->getInternalArgument('__fromClientUri') !== NULL) {
-                        // the login was initiated from a specific page - we send the user back there
-                        $this->redirectToUri($this->request->getInternalArgument('__fromClientUri'));
-                    } elseif ($this->request->getReferringRequest() !== NULL) {
-                        $requestToRedirect = $this->request->getReferringRequest();
-                    }
-                    if (isset($requestToRedirect)
-                        && $requestToRedirect->getHttpRequest()->getHeader('X-Requested-With') !== 'XMLHttpRequest'	// it's possible that accidentally XMLHttpRequest requests were intercepted, and we don't want to redirect to them ofc
-                        && !in_array($requestToRedirect->getControllerName(), array('Authentication', 'Landing'))) {
-                        $this->redirectToRequest($requestToRedirect);
-                    }
-                } catch (InvalidActionNameException $exception) {
-                    $this->systemLogger->logException($exception);
+            try {
+                if ($originalRequest !== NULL) {
+                    $requestToRedirect = $originalRequest;
+                } elseif ($this->request->getInternalArgument('__fromClientUri') !== NULL) {
+                    // the login was initiated from a specific page - we send the user back there
+                    $this->redirectToUri($this->request->getInternalArgument('__fromClientUri'));
+                } elseif ($this->request->getReferringRequest() !== NULL) {
+                    $requestToRedirect = $this->request->getReferringRequest();
                 }
+                if (isset($requestToRedirect)
+                    && $requestToRedirect->getHttpRequest()->getHeader('X-Requested-With') !== 'XMLHttpRequest'	// it's possible that accidentally XMLHttpRequest requests were intercepted, and we don't want to redirect to them ofc
+                    && !in_array($requestToRedirect->getControllerName(), array('Authentication', 'Landing'))) {
+                    $this->redirectToRequest($requestToRedirect);
+                }
+            } catch (InvalidActionNameException $exception) {
+                $this->systemLogger->logException($exception);
             }
-        //}
+        }
+
         $this->persistenceManager->persistAll();
-        $this->redirect('index','Backend\Backend','TYPO3.Neos');
+        $this->redirect('index','backend\module','TYPO3.Neos',array('module' => 'management/InstagramMedia'));
     }
 
     /**
      * @param AuthenticationRequiredException $exception
      */
     protected function onAuthenticationFailure(AuthenticationRequiredException $exception = NULL) {
-
-\TYPO3\Flow\var_dump('OnAuthenticationFailure');
         /** @var $token TokenInterface */
-       /*
         foreach ($this->securityContext->getAuthenticationTokens() as $token) {
             if ($token instanceof AbstractClientToken && $token->getAuthenticationStatus() === TokenInterface::WRONG_CREDENTIALS) {
-                $this->addFlashMessage('An error occurred during your log in. Please make sure you\'re granting all required permissions because this is need for wishbase to run.', 'Wrong input', Message::SEVERITY_ERROR, array(), 1383817435);
+                $this->addFlashMessage('An error occurred during your log in. Please make sure you\'re granting all required permissions because this is need for the Instagram Client to run.', 'Wrong input', Message::SEVERITY_ERROR, array(), 1383817435);
                 $this->forward('login');
                 break;
             }
         }
         $this->addFlashMessage('The e-mail address or the password have not been entered correctly.', 'Wrong input', Message::SEVERITY_ERROR, array(), 1371119714);
-        $this->forward('login')
-       */
+        $this->forward('index');
     }
 
     /**
