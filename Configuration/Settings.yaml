@@ -8,24 +8,27 @@ TYPO3:
               controllerObjectName: 'TYPO3\Neos\Controller\.*|TYPO3\Neos\Service\.*|TYPO3\Media\Controller\.*|Weissheiten\OAuth2\ClientInstagram\Controller\.*|Weissheiten\Neos\InstagramMedia\Controller\.*'
           InstagramOAuth2Provider:
             provider: 'Weissheiten\OAuth2\ClientInstagram\Provider\InstagramProvider'
-            # entryPoint: 'WebRedirect'
-            # entryPointOptions:
-             # routeValues:
-              #  '@package':    'Weissheiten.Neos.InstagramMedia'
-              #  '@controller': 'Collection'
-              #  '@action':     'index'
-              #  '@format':     'html'
+            entryPoint: 'WebRedirect'
+            entryPointOptions:
+             routeValues:
+              '@package':    'Weissheiten.Neos.InstagramMedia'
+              '@controller': 'Login'
+              '@action':     'login'
+              '@format':     'html'
             providerOptions:
               authorizationEndpointUri: 'https://api.instagram.com/oauth/authorize/'
               redirectionEndpointUri: 'http://dev.neos/neos/authentication/authenticateInstagram'
               tokenEndpointUri: 'https://api.instagram.com/oauth/access_token'
               tokenEndpointClassName: Weissheiten\OAuth2\ClientInstagram\Endpoint\InstagramTokenEndpoint
-              clientIdentifier: '408c1b99e27a4bc2a0af1445f35421c4'
-              clientSecret: 'c126ad4dab4947518167dff06b2189cb'
+              clientIdentifier: '- client ID -'
+              clientSecret: '- client Secret -'
               responseType: code
               scopes:
                 - basic
               display: basic
-            #requestPatterns:
-              #controllerObjectName: 'Weissheiten\Neos\InstagramMedia\Controller\.*'
+            requestPatterns:
+              controllerObjectName: 'Weissheiten\Neos\InstagramMedia\Controller\.*|Weissheiten\OAuth2\ClientInstagram\Controller\.*'
+          FacebookOAuth2Provider:
+            requestPatterns:
+              controllerObjectName: 'Non.Existent.Mapping'
         authenticationStrategy: atLeastOneToken

@@ -212,4 +212,22 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
         $this->authenticationServicesUserData[(string)$token] = json_decode($content, TRUE)['data'];
     }
 
+    /**
+     * This returns the (first) *authenticated* OAuth token which doesn't have a party attached.
+     *
+     *@return AbstractClientToken
+     */
+    public function getChargedAuthenticatedTokenHavingPartyAttached() {
+        /** @var $token AbstractClientToken */
+        foreach ((array)$this->securityContext->getAuthenticationTokensOfType($this->getTokenClassName()) as $token) {
+            if ($token->getAuthenticationStatus() === TokenInterface::AUTHENTICATION_SUCCESSFUL
+                && ($token->getAccount() !== NULL || $this->partyService->getAssignedPartyOfAccount($token->getAccount()) !== NULL)
+            ) {
+                return $token;
+            }
+        }
+        return NULL;
+    }
+
+
 }

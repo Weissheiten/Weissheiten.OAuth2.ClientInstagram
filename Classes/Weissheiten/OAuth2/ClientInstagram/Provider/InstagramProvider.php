@@ -70,6 +70,9 @@ class InstagramProvider extends AbstractClientProvider {
                 return FALSE;
             }
         }
+        else{
+
+        }
 
         // From here, we surely know the user is considered authenticated against the remote service,
         // yet to check if there is an immanent account present.

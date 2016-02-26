@@ -10,6 +10,8 @@ use TYPO3\Flow\Http\Client\RequestEngineInterface;
 use TYPO3\Flow\Http\Request;
 use TYPO3\Flow\Http\Uri;
 use TYPO3\Flow\Object\DependencyInjection\DependencyProxy;
+use Flowpack\OAuth2\Client\Exception as OAuth2Exception;
+
 /**
  * @Flow\Scope("singleton")
  */
@@ -35,6 +37,12 @@ class InstagramApiClient
     protected $currentAccessToken;
 
     /**
+     * @Flow\Inject
+     * @var \TYPO3\Flow\Log\SecurityLoggerInterface
+     */
+    protected $securityLogger;
+
+    /**
      */
     public function initializeObject() {
         if (($this->requestEngine instanceof DependencyProxy
@@ -44,6 +52,22 @@ class InstagramApiClient
             $this->requestEngine->setOption(CURLOPT_SSL_VERIFYPEER, TRUE);
         }
     }
+
+    /**
+     * @param string $method
+     * @return bool returns the users own data or null if access was not possible
+     */
+    public function getOwnUserData($method = 'GET'){
+        $response = $this->query('/users/self');
+        if ($response->getStatusCode() !== 200) {
+            $this->securityLogger->log(new OAuth2Exception(sprintf('The response was not of type 200 but gave code and error %d "%s"', $response->getStatusCode(), $response), 1456487579));
+            return null;
+        }
+        else{
+            return json_decode($response->getContent(),true)['data'];
+        }
+    }
+
     /**
      * @param string $resource
      * @param string $method

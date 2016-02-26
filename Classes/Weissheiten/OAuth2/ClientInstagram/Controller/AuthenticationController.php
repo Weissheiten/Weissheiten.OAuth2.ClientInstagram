@@ -19,7 +19,6 @@ use Flowpack\OAuth2\Client\Exception\InvalidPartyDataException;
 
 use Flowpack\OAuth2\Client\Token\AbstractClientToken;
 use Weissheiten\OAuth2\ClientInstagram\Flow\InstagramFlow;
-use Weissheiten\OAuth2\ClientInstagram\Security\Account;
 use TYPO3\Party\Domain\Service\PartyService;
 
 /**
@@ -77,9 +76,9 @@ class AuthenticationController extends AbstractAuthenticationController {
 
     /**
      * @Flow\Inject
-     * @var \TYPO3\Flow\Log\SystemLoggerInterface
+     * @var \TYPO3\Flow\Log\SecurityLoggerInterface
      */
-    protected $systemLogger;
+    protected $securityLogger;
 
     /**
      * In this case, an authentication has successfully been conducted and it's upon us
@@ -118,34 +117,40 @@ class AuthenticationController extends AbstractAuthenticationController {
                 $user = $this->userService->getCurrentUser();
                 $user->addAccount($instagramAccount);
                 $this->userRepository->update($user);
-                $this->persistenceManager->persistAll();
             }
             else{
                 //$this->onAuthenticationFailure(new AuthenticationRequiredException('Instagram Userdata could not be retrieved'));
-                $this->systemLogger->logException(new Exception("Could not retrieve UserData from Instagram in Weissheiten.Neos.InstagramMedia"));
+                $this->securityLogger->logException(new Exception("Could not retrieve UserData from Instagram in Weissheiten.Neos.InstagramMedia"));
             }
         }
         else{
-			try {
-				if ($originalRequest !== NULL) {
-					$requestToRedirect = $originalRequest;
-				} elseif ($this->request->getInternalArgument('__fromClientUri') !== NULL) {
-					// the login was initiated from a specific page - we send the user back there
-					$this->redirectToUri($this->request->getInternalArgument('__fromClientUri'));
-				} elseif ($this->request->getReferringRequest() !== NULL) {
-					$requestToRedirect = $this->request->getReferringRequest();
-				}
-				if (isset($requestToRedirect)
-					&& $requestToRedirect->getHttpRequest()->getHeader('X-Requested-With') !== 'XMLHttpRequest'	// it's possible that accidentally XMLHttpRequest requests were intercepted, and we don't want to redirect to them ofc
-					&& !in_array($requestToRedirect->getControllerName(), array('Authentication', 'Landing'))) {
-					$this->redirectToRequest($requestToRedirect);
-				}
-			} catch (InvalidActionNameException $exception) {
-				$this->systemLogger->logException($exception);
-			}
-        }
-
-        //$this->forward('index','Backend\Backend','TYPO3.Neos');
+           // $OAuthTokenWithParty = $this->authenticationFlow->getChargedAuthenticatedTokenHavingPartyAttached();
+           // \TYPO3\Flow\var_dump($OAuthTokenWithParty);
+            /*
+            if($OAuthTokenWithParty!== NULL) {
+                  $OAuthTokenWithParty->setAccount();
+              }
+              else*/
+                try {
+                    if ($originalRequest !== NULL) {
+                        $requestToRedirect = $originalRequest;
+                    } elseif ($this->request->getInternalArgument('__fromClientUri') !== NULL) {
+                        // the login was initiated from a specific page - we send the user back there
+                        $this->redirectToUri($this->request->getInternalArgument('__fromClientUri'));
+                    } elseif ($this->request->getReferringRequest() !== NULL) {
+                        $requestToRedirect = $this->request->getReferringRequest();
+                    }
+                    if (isset($requestToRedirect)
+                        && $requestToRedirect->getHttpRequest()->getHeader('X-Requested-With') !== 'XMLHttpRequest'	// it's possible that accidentally XMLHttpRequest requests were intercepted, and we don't want to redirect to them ofc
+                        && !in_array($requestToRedirect->getControllerName(), array('Authentication', 'Landing'))) {
+                        $this->redirectToRequest($requestToRedirect);
+                    }
+                } catch (InvalidActionNameException $exception) {
+                    $this->systemLogger->logException($exception);
+                }
+            }
+        //}
+        $this->persistenceManager->persistAll();
         $this->redirect('index','Backend\Backend','TYPO3.Neos');
     }
 
@@ -153,8 +158,8 @@ class AuthenticationController extends AbstractAuthenticationController {
      * @param AuthenticationRequiredException $exception
      */
     protected function onAuthenticationFailure(AuthenticationRequiredException $exception = NULL) {
-        \TYPO3\Flow\var_dump('Authentication Failure');
 
+\TYPO3\Flow\var_dump('OnAuthenticationFailure');
         /** @var $token TokenInterface */
        /*
         foreach ($this->securityContext->getAuthenticationTokens() as $token) {
