@@ -58,14 +58,28 @@ class InstagramApiClient
      * @return bool returns the users own data or null if access was not possible
      */
     public function getOwnUserData($method = 'GET'){
-        $response = $this->query('/users/self');
-        if ($response->getStatusCode() !== 200) {
-            $this->securityLogger->log(new OAuth2Exception(sprintf('The response was not of type 200 but gave code and error %d "%s"', $response->getStatusCode(), $response), 1456487579));
-            return null;
+        try{
+            // will throw a 404 error if the user is not logged in, we expect this to happen so we don't log this
+            return $this->query('/users/self');
         }
-        else{
-            return json_decode($response->getContent(),true)['data'];
+        catch(OAuth2Exception $e){
+            return false;
         }
+    }
+
+    /**
+     * Generate a sig for secure API calls
+     *
+     * @param $params
+     * @return string
+     */
+    private function generate_sig($relEndpoint, $params) {
+        $sig = $relEndpoint;
+        ksort($params);
+        foreach ($params as $key => $val) {
+            $sig .= "|$key=$val";
+        }
+        return hash_hmac('sha256', $sig, $this->appSecret, false);
     }
 
     /**
@@ -73,15 +87,24 @@ class InstagramApiClient
      * @param string $method
      * @return \TYPO3\Flow\Http\Response
      */
-    public function query($resource, $method = 'GET') {
-        $uri = new Uri($this->endpoint . $resource);
-        parse_str((string)$uri->getQuery(), $query);
-        $query['access_token'] = $this->currentAccessToken;
-        $query['appsecret_proof'] = hash_hmac('sha256', $this->currentAccessToken, $this->appSecret);
-        $uri->setQuery(http_build_query($query));
-        $request = Request::create($uri, $method);
+    public function query($resource, $requestArguments = array(), $method = 'GET') {
+        $requestArguments['access_token'] = $this->currentAccessToken;
+        $requestArguments['sig'] = $this->generate_sig($resource, $requestArguments);
+
+        // test the secure API call by getting information of the own user - scope: basic (also available in sandbox mode)
+        $request = Request::create(new Uri($this->endpoint . $resource . "?" . http_build_query($requestArguments)));
         $response = $this->requestEngine->sendRequest($request);
-        return $response;
+        $responseContent = $response->getContent();
+
+        if ($response->getStatusCode() !== 200) {
+            $this->securityLogger->log('Error in Instagram Query: '.$responseContent);
+            throw new OAuth2Exception(sprintf('The response was not of type 200 but gave code and error %d "%s"', $response->getStatusCode(), $responseContent), 1455261376);
+        }
+
+        $responseArray = json_decode($responseContent,true);
+        $responseData = $responseArray['data'];
+
+        return $responseData;
     }
     /**
      * @param string $currentAccessToken

@@ -26,6 +26,13 @@ class InstagramTokenEndpoint extends AbstractHttpTokenEndpoint implements TokenE
      */
     protected $securityLogger;
 
+
+    /**
+     * @Flow\Inject
+     * @var \Weissheiten\OAuth2\ClientInstagram\Utility\InstagramApiClient
+     */
+    protected $instagramApiClient;
+
     /**
      * Inspect the received access token
      *
@@ -34,6 +41,7 @@ class InstagramTokenEndpoint extends AbstractHttpTokenEndpoint implements TokenE
      * @throws OAuth2Exception
      */
     public function validateSecureRequestCapability($accessToken) {
+        /*
         $requestArguments = array(
             'access_token' => $accessToken
         );
@@ -50,28 +58,15 @@ class InstagramTokenEndpoint extends AbstractHttpTokenEndpoint implements TokenE
 
         $responseArray = json_decode($responseContent,true);
         $responseData = $responseArray['data'];
-
+*/
+        $this->instagramApiClient->setCurrentAccessToken($accessToken);
+        $responseData = $this->instagramApiClient->getOwnUserData();
         // at least ID and Username are mandatory
         if(!isset($responseData['id']) || !isset($responseData['username'])){
             return FALSE;
         }
 
         return $responseData;
-    }
-
-    /**
-     * Generate a sig for secure API calls
-     *
-     * @param $params
-     * @return string
-     */
-    private function generate_sig($params) {
-        $sig = $this->endpointUri;
-        ksort($params);
-        foreach ($params as $key => $val) {
-            $sig .= "|$key=$val";
-        }
-        return hash_hmac('sha256', $sig, $this->clientSecret, false);
     }
 
     // This function should not be necessary - problem is decoding the response tailored for facebook in original package, we need to json_decode here
