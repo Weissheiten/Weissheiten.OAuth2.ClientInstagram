@@ -41,24 +41,6 @@ class InstagramTokenEndpoint extends AbstractHttpTokenEndpoint implements TokenE
      * @throws OAuth2Exception
      */
     public function validateSecureRequestCapability($accessToken) {
-        /*
-        $requestArguments = array(
-            'access_token' => $accessToken
-        );
-        $requestArguments['sig'] = $this->generate_sig($requestArguments);
-
-        // test the secure API call by getting information of the own user - scope: basic (also available in sandbox mode)
-        $request = Request::create(new Uri('https://api.instagram.com/v1/users/self/?' . http_build_query($requestArguments)));
-        $response = $this->requestEngine->sendRequest($request);
-        $responseContent = $response->getContent();
-
-        if ($response->getStatusCode() !== 200) {
-            throw new OAuth2Exception(sprintf('The response was not of type 200 but gave code and error %d "%s"', $response->getStatusCode(), $responseContent), 1455261376);
-        }
-
-        $responseArray = json_decode($responseContent,true);
-        $responseData = $responseArray['data'];
-*/
         $this->instagramApiClient->setCurrentAccessToken($accessToken);
         $responseData = $this->instagramApiClient->getOwnUserData();
         // at least ID and Username are mandatory

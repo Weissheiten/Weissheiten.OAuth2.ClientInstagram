@@ -112,4 +112,9 @@ class InstagramApiClient
     public function setCurrentAccessToken($currentAccessToken) {
         $this->currentAccessToken = $currentAccessToken;
     }
+
+    public function searchByTag($tag, $count = 5){
+        $requestArguments = array('count' => $count);
+        return $this->query('/tags/'.$tag.'/media/recent', $requestArguments);
+    }
 }

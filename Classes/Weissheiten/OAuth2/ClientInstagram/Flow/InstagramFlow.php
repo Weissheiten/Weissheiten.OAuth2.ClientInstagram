@@ -30,6 +30,7 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
      * @var \Weissheiten\OAuth2\ClientInstagram\Utility\InstagramApiClient
      */
     protected $instagramApiClient;
+
     /**
      * @Flow\Inject
      * @var PartyRepository
@@ -71,32 +72,12 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
     protected $tokenForeignAccounts = array();
 
     /**
-     * @param Account $account
-     * @return void
-     */
-    public function attachAccountToBackendParty(Account $account){
-        $user = $this->userService->getCurrentUser();
-        \TYPO3\Flow\var_dump($user);
-        \TYPO3\Flow\var_dump($account->getAccountIdentifier());
-        $user->addAccount($account);
-    }
-
-    /**
-     * @param Account $instagramAccount
-     * @return \TYPO3\Party\Domain\Model\AbstractParty;
-     */
-    public function verifyPartyForAccount(Account $instagramAccount){
-        if($this->partyService->getAssignedPartyOfAccount($instagramAccount)===NULL){
-            $this->attachAccountToBackendParty($instagramAccount);
-        }
-    }
-
-    /**
      * @return \TYPO3\Flow\Security\Account
      */
     public function getInstagramAccountHavingParty(){
         foreach($this->userService->getCurrentUser()->getAccounts() as $account){
-            if($account->getAuthenticationProviderName==='InstagramOAuth2Provider'){
+            /* @var $account \TYPO3\Flow\Security\Account */
+            if($account->getAuthenticationProviderName()==='InstagramOAuth2Provider'){
                 return $account;
             }
         }
@@ -138,12 +119,10 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
      */
     public function setPartyOfAuthenticatedTokenAndAttachToAccountFor(TokenInterface $foreignAccountToken, AbstractClientToken $possibleOAuthTokenAuthenticatedWithoutParty) {
         $oauthAccount = $possibleOAuthTokenAuthenticatedWithoutParty->getAccount();
+
         // TODO: this must be properly specifiable (the Roles to add)
         #$oauthAccount->setRoles();
 
-        // deprecated Version
-        //$oauthAccount->setParty($foreignAccountToken->getAccount()->getParty());
-        // new implementation
         $this->partyService->assignAccountToParty($oauthAccount,$this->partyService->getAssignedPartyOfAccount($foreignAccountToken));
         $this->accountRepository->update($oauthAccount);
     }
@@ -153,6 +132,8 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
      * @throws InvalidPartyDataException
      */
     public function createPartyAndAttachToAccountFor(AbstractClientToken $token) {
+        // actually this is only implemented because of the base class at this time
+        /*
         $userData = $this->authenticationServicesUserData[(string)$token];
         $party = new Person();
         $party->setName(new PersonName('', $userData['first_name'], '', $userData['last_name']));
@@ -179,6 +160,7 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
         #$account->setRoles();
         $this->accountRepository->update($account);
         $this->partyRepository->add($party);
+        */
     }
 
     /**
@@ -211,6 +193,23 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
         $content = $this->instagramApiClient->query('/users/self')->getContent();
         $this->authenticationServicesUserData[(string)$token] = json_decode($content, TRUE)['data'];
     }
+
+    /**
+     * Returns the UserData of the currently logged in user or null if none is logged in
+     * also sets the access token in this process if there is one available and it is not set yet
+     * @return array
+     */
+    public function getUserData(){
+        $userData = NULL;
+
+        $instagramAccessToken = $this->getInstagramAccountHavingParty()->getCredentialsSource();
+        if($instagramAccessToken!==NULL){
+            $this->instagramApiClient->setCurrentAccessToken($instagramAccessToken);
+            $userData = $this->instagramApiClient->getOwnUserData();
+        }
+        return $userData;
+    }
+
 
     /**
      * This returns the (first) *authenticated* OAuth token which doesn't have a party attached.

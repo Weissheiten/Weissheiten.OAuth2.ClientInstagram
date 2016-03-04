@@ -20,11 +20,11 @@ TYPO3:
               redirectionEndpointUri: 'http://dev.neos/neos/authentication/authenticateInstagram'
               tokenEndpointUri: 'https://api.instagram.com/oauth/access_token'
               tokenEndpointClassName: Weissheiten\OAuth2\ClientInstagram\Endpoint\InstagramTokenEndpoint
-              clientIdentifier: '-- Client ID --'
-              clientSecret: '-- Client Secret --'
+              clientIdentifier: '--client ID--'
+              clientSecret: '--client Secret --'
               responseType: code
               scopes:
-                - basic
+                - public_content
               display: basic
             requestPatterns:
               controllerObjectName: 'Weissheiten\Neos\InstagramMedia\Controller\.*|Weissheiten\OAuth2\ClientInstagram\Controller\.*'
