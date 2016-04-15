@@ -202,10 +202,13 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
     public function getUserData(){
         $userData = NULL;
 
-        $instagramAccessToken = $this->getInstagramAccountHavingParty()->getCredentialsSource();
-        if($instagramAccessToken!==NULL){
-            $this->instagramApiClient->setCurrentAccessToken($instagramAccessToken);
-            $userData = $this->instagramApiClient->getOwnUserData();
+        $instagramAccountWithParty = $this->getInstagramAccountHavingParty();
+        if($instagramAccountWithParty!==NULL){
+            $instagramAccessToken = $this->getInstagramAccountHavingParty()->getCredentialsSource();
+            if($instagramAccessToken!==NULL){
+                $this->instagramApiClient->setCurrentAccessToken($instagramAccessToken);
+                $userData = $this->instagramApiClient->getOwnUserData();
+            }
         }
         return $userData;
     }
