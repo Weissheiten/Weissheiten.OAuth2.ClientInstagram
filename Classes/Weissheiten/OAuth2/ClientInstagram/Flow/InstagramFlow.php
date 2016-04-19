@@ -190,8 +190,7 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
     protected function initializeUserData(AbstractClientToken $token) {
         $credentials = $token->getCredentials();
         $this->instagramApiClient->setCurrentAccessToken($credentials['accessToken']);
-        $content = $this->instagramApiClient->query('/users/self')->getContent();
-        $this->authenticationServicesUserData[(string)$token] = json_decode($content, TRUE)['data'];
+        $this->authenticationServicesUserData[(string)$token] = $this->instagramApiClient->query('/users/self');
     }
 
     /**

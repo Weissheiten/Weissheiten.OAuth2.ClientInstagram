@@ -117,6 +117,7 @@ class AuthenticationController extends AbstractAuthenticationController {
                 $user = $this->userService->getCurrentUser();
                 $user->addAccount($instagramAccount);
                 $this->userRepository->update($user);
+
             }
             else{
                 $this->securityLogger->logException(new Exception("Could not retrieve UserData from Instagram in Weissheiten.Neos.InstagramMedia"));
