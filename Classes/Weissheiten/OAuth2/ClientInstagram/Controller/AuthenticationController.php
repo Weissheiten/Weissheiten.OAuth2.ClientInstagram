@@ -106,9 +106,13 @@ class AuthenticationController extends AbstractAuthenticationController {
                 // does an account for this Token already exist
                 $instagramAccount = $this->accountRepository->findByAccountIdentifierAndAuthenticationProviderName($userdata['id'],'InstagramOAuth2Provider');
 
+                \TYPO3\Flow\var_dump($this->accountRepository->findAll()->toArray());
+
                 if($instagramAccount===NULL){
                     $instagramAccount = new \TYPO3\Flow\Security\Account();
                     $instagramAccount->setAccountIdentifier($userdata['id']);
+                    $instagramAccount->setAuthenticationProviderName('InstagramOAuth2Provider');
+                    $this->accountRepository->add($instagramAccount);
                 }
 
                 // Associate this new Account with the token
