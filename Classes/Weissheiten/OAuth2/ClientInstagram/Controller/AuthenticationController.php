@@ -62,11 +62,7 @@ class AuthenticationController extends AbstractAuthenticationController {
      */
     protected $userService;
 
-    /**
-     * @Flow\Inject
-     * @var PersistenceManagerInterface
-     */
-    protected $persistenceManager;
+
 
     /**
      * @Flow\Inject
@@ -94,7 +90,7 @@ class AuthenticationController extends AbstractAuthenticationController {
      * @return string
      */
     protected function onAuthenticationSuccess(\TYPO3\Flow\Mvc\ActionRequest $originalRequest = NULL) {
-
+/*
         // check if there is an unassigned authentication token
         $possibleOAuthTokenAuthenticatedWithoutParty = $this->authenticationFlow->getChargedAuthenticatedTokenHavingNoPartyAttached();
 
@@ -106,13 +102,14 @@ class AuthenticationController extends AbstractAuthenticationController {
                 // does an account for this Token already exist
                 $instagramAccount = $this->accountRepository->findByAccountIdentifierAndAuthenticationProviderName($userdata['id'],'InstagramOAuth2Provider');
 
-                \TYPO3\Flow\var_dump($this->accountRepository->findAll()->toArray());
+                // \TYPO3\Flow\var_dump($this->accountRepository->findAll()->toArray());
 
                 if($instagramAccount===NULL){
                     $instagramAccount = new \TYPO3\Flow\Security\Account();
                     $instagramAccount->setAccountIdentifier($userdata['id']);
                     $instagramAccount->setAuthenticationProviderName('InstagramOAuth2Provider');
-                    $this->accountRepository->add($instagramAccount);
+                    //$this->accountRepository->add($instagramAccount);
+
                 }
 
                 // Associate this new Account with the token
@@ -146,8 +143,7 @@ class AuthenticationController extends AbstractAuthenticationController {
                 $this->systemLogger->logException($exception);
             }
         }
-
-        $this->persistenceManager->persistAll();
+*/
         $this->redirect('index','backend\module','TYPO3.Neos',array('module' => 'management/InstagramMedia'));
     }
 

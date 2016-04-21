@@ -75,7 +75,7 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
      * @return \TYPO3\Flow\Security\Account
      */
     public function getInstagramAccountHavingParty(){
-        foreach($this->userService->getCurrentUser()->getAccounts() as $account){
+       foreach($this->userService->getCurrentUser()->getAccounts() as $account){
             /* @var $account \TYPO3\Flow\Security\Account */
             if($account->getAuthenticationProviderName()==='InstagramOAuth2Provider'){
                 return $account;
@@ -190,7 +190,7 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
     protected function initializeUserData(AbstractClientToken $token) {
         $credentials = $token->getCredentials();
         $this->instagramApiClient->setCurrentAccessToken($credentials['accessToken']);
-        $this->authenticationServicesUserData[(string)$token] = $this->instagramApiClient->query('/users/self');
+        $this->authenticationServicesUserData[(string)$token] = $this->instagramApiClient->query('/users/self')['data'];
     }
 
     /**

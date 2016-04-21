@@ -60,7 +60,7 @@ class InstagramApiClient
     public function getOwnUserData($method = 'GET'){
         try{
             // will throw a 404 error if the user is not logged in, we expect this to happen so we don't log this
-            return $this->query('/users/self');
+            return $this->query('/users/self')['data'];
         }
         catch(OAuth2Exception $e){
             return false;
@@ -84,8 +84,10 @@ class InstagramApiClient
 
     /**
      * @param string $resource
+     * @param array $requestArguments
      * @param string $method
-     * @return \TYPO3\Flow\Http\Response
+     * @return mixed
+     * @throws OAuth2Exception
      */
     public function query($resource, $requestArguments = array(), $method = 'GET') {
         $requestArguments['access_token'] = $this->currentAccessToken;
@@ -101,10 +103,7 @@ class InstagramApiClient
             throw new OAuth2Exception(sprintf('The response was not of type 200 but gave code and error %d "%s"', $response->getStatusCode(), $responseContent), 1455261376);
         }
 
-        $responseArray = json_decode($responseContent,true);
-        $responseData = $responseArray['data'];
-
-        return $responseData;
+        return json_decode($responseContent,true);
     }
     /**
      * @param string $currentAccessToken
@@ -113,8 +112,27 @@ class InstagramApiClient
         $this->currentAccessToken = $currentAccessToken;
     }
 
-    public function searchByTag($tag, $count = 5){
+    /**
+     * Searches instagram for results having a specific hashtag before min_tag_id or after max_tag_id
+     * Returns a number of results equal to $count
+     *     *
+     * @param $tag
+     * @param int $count
+     * @param null $min_tag_id
+     * @param null $mag_tag_id
+     * @return mixed
+     * @throws OAuth2Exception
+     */
+    public function searchByTag($tag, $count = 5, $min_tag_id = null, $max_tag_id = null){
         $requestArguments = array('count' => $count);
+        if($min_tag_id!==null && is_numeric($min_tag_id)){
+            $requestArguments['min_tag_id'] = $min_tag_id;
+        }
+
+        if($max_tag_id!==null && is_numeric($max_tag_id)){
+            $requestArguments['max_tag_id'] = $max_tag_id;
+        }
+
         return $this->query('/tags/'.$tag.'/media/recent', $requestArguments);
     }
 }

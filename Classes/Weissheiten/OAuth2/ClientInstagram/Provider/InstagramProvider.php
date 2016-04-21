@@ -9,9 +9,11 @@ use Flowpack\OAuth2\Client\Token\AbstractClientToken;
 use Flowpack\OAuth2\Client\Provider\AbstractClientProvider;
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Log\SecurityLoggerInterface;
+use TYPO3\Flow\Persistence\PersistenceManagerInterface;
 use TYPO3\Flow\Security\Account;
 use TYPO3\Flow\Security\Authentication\TokenInterface;
 use TYPO3\Flow\Security\Exception\UnsupportedAuthenticationTokenException;
+use TYPO3\Party\Domain\Service\PartyService;
 
 /**
  */
@@ -40,6 +42,25 @@ class InstagramProvider extends AbstractClientProvider {
      * @var \Weissheiten\OAuth2\ClientInstagram\Endpoint\InstagramTokenEndpoint
      */
     protected $instagramTokenEndpoint;
+
+    /**
+     * @Flow\Inject
+     * @var PartyService
+     */
+    protected $partyService;
+
+    /**
+     * @var \TYPO3\Neos\Domain\Service\UserService
+     * @Flow\Inject
+     */
+    protected $userService;
+
+    /**
+     * @Flow\Inject
+     * @var PersistenceManagerInterface
+     */
+    protected $persistenceManager;
+
 
     /**
      * Tries to authenticate the given token. Sets isAuthenticated to TRUE if authentication succeeded.
@@ -85,6 +106,7 @@ class InstagramProvider extends AbstractClientProvider {
         $this->securityContext->withoutAuthorizationChecks(function() use ($userInfo, $providerName, $accountRepository, &$account) {
             $account = $accountRepository->findByAccountIdentifierAndAuthenticationProviderName($userInfo['id'], $providerName);
         });
+
         if ($account === NULL) {
             $account = new Account();
             $account->setAccountIdentifier($userInfo['id']);
@@ -96,6 +118,16 @@ class InstagramProvider extends AbstractClientProvider {
         // the access token is valid for an "undefined time" according to instagram (so we cannot know when the user needs to log in again)
         $account->setCredentialsSource($credentials['accessToken']);
         $this->accountRepository->update($account);
+
+        $user = $this->userService->getCurrentUser();
+        $user->addAccount($account);
+        $this->userService->updateUser($user);
+
+        // persistAll is called automatically at the end of this function, account gets whitelisted to allow
+        // persisting for an object thats tinkered with via a GET request
+        $this->persistenceManager->whitelistObject($account);
+        $this->persistenceManager->whitelistObject($user);
+
     }
 
     /**
