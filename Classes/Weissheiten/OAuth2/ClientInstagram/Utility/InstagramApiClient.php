@@ -95,6 +95,9 @@ class InstagramApiClient
 
         // test the secure API call by getting information of the own user - scope: basic (also available in sandbox mode)
         $request = Request::create(new Uri($this->endpoint . $resource . "?" . http_build_query($requestArguments)));
+
+//       \TYPO3\Flow\var_dump($request);
+
         $response = $this->requestEngine->sendRequest($request);
         $responseContent = $response->getContent();
 
@@ -125,11 +128,11 @@ class InstagramApiClient
      */
     public function searchByTag($tag, $count = 5, $min_tag_id = null, $max_tag_id = null){
         $requestArguments = array('count' => $count);
-        if($min_tag_id!==null && is_numeric($min_tag_id)){
+        if($min_tag_id!==null && $min_tag_id!==''){
             $requestArguments['min_tag_id'] = $min_tag_id;
         }
 
-        if($max_tag_id!==null && is_numeric($max_tag_id)){
+        if($max_tag_id!==null && $max_tag_id!==''){
             $requestArguments['max_tag_id'] = $max_tag_id;
         }
 
