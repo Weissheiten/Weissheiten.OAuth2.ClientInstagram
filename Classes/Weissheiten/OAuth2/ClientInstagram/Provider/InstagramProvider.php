@@ -119,15 +119,17 @@ class InstagramProvider extends AbstractClientProvider {
         $account->setCredentialsSource($credentials['accessToken']);
         $this->accountRepository->update($account);
 
-        $user = $this->userService->getCurrentUser();
-        $user->addAccount($account);
-        $this->userService->updateUser($user);
+        // check if a user is already attached to this account
+        if($this->partyService->getAssignedPartyOfAccount($account)===null || count($this->partyService->getAssignedPartyOfAccount($account)) < 1){
+            $user = $this->userService->getCurrentUser();
+            $user->addAccount($account);
+            $this->userService->updateUser($user);
+            $this->persistenceManager->whitelistObject($user);
+        }
 
         // persistAll is called automatically at the end of this function, account gets whitelisted to allow
         // persisting for an object thats tinkered with via a GET request
         $this->persistenceManager->whitelistObject($account);
-        $this->persistenceManager->whitelistObject($user);
-
     }
 
     /**
