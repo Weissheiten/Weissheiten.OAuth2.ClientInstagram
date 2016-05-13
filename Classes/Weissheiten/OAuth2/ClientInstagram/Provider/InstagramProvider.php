@@ -5,6 +5,7 @@ namespace Weissheiten\OAuth2\ClientInstagram\Provider;
  * This script belongs to the TYPO3 Flow package "Weissheiten.OAuth2.ClientInstagram".  *
  *                                                                                      */
 
+use Flowpack\OAuth2\Client\Exception;
 use Flowpack\OAuth2\Client\Token\AbstractClientToken;
 use Flowpack\OAuth2\Client\Provider\AbstractClientProvider;
 use TYPO3\Flow\Annotations as Flow;
@@ -122,9 +123,14 @@ class InstagramProvider extends AbstractClientProvider {
         // check if a user is already attached to this account
         if($this->partyService->getAssignedPartyOfAccount($account)===null || count($this->partyService->getAssignedPartyOfAccount($account)) < 1){
             $user = $this->userService->getCurrentUser();
-            $user->addAccount($account);
-            $this->userService->updateUser($user);
-            $this->persistenceManager->whitelistObject($user);
+            if($user!==null){
+                $user->addAccount($account);
+                $this->userService->updateUser($user);
+                $this->persistenceManager->whitelistObject($user);
+            }
+            else{
+                $this->securityLogger->logException(new Exception("The InstagramProvider was unable to determine the backend user, make sure the configuration Typo3BackendProvider requestPattern matches the Instagram Controller and the authentication strategy is set to 'atLeastOne' Token"));
+            }
         }
 
         // persistAll is called automatically at the end of this function, account gets whitelisted to allow
