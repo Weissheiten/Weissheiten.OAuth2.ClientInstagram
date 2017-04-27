@@ -7,11 +7,11 @@ namespace Weissheiten\OAuth2\ClientInstagram\Token;
 
 use Flowpack\OAuth2\Client\Token\AbstractClientToken;
 use Flowpack\OAuth2\Client\Provider\AbstractClientProvider;
-use TYPO3\Flow\Annotations as Flow;
-use TYPO3\Flow\Log\SecurityLoggerInterface;
-use TYPO3\Flow\Security\Account;
-use TYPO3\Flow\Security\Authentication\TokenInterface;
-use TYPO3\Flow\Security\Exception\UnsupportedAuthenticationTokenException;
+use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Log\SecurityLoggerInterface;
+use Neos\Flow\Security\Account;
+use Neos\Flow\Security\Authentication\TokenInterface;
+use Neos\Flow\Security\Exception\UnsupportedAuthenticationTokenException;
 
 /**
  */

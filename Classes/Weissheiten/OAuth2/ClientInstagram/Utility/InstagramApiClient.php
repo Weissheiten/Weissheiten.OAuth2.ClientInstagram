@@ -4,12 +4,12 @@ namespace Weissheiten\OAuth2\ClientInstagram\Utility;
 /*                                                                                      *
  * This script belongs to the TYPO3 Flow package "Weissheiten.OAuth2.ClientInstagram".  *
  *                                                                                      */
-use TYPO3\Flow\Annotations as Flow;
-use TYPO3\Flow\Http\Client\CurlEngine;
-use TYPO3\Flow\Http\Client\RequestEngineInterface;
-use TYPO3\Flow\Http\Request;
-use TYPO3\Flow\Http\Uri;
-use TYPO3\Flow\Object\DependencyInjection\DependencyProxy;
+use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Http\Client\CurlEngine;
+use Neos\Flow\Http\Client\RequestEngineInterface;
+use Neos\Flow\Http\Request;
+use Neos\Flow\Http\Uri;
+use Neos\Flow\ObjectManagement\DependencyInjection\DependencyProxy;
 use Flowpack\OAuth2\Client\Exception as OAuth2Exception;
 
 /**
@@ -38,7 +38,7 @@ class InstagramApiClient
 
     /**
      * @Flow\Inject
-     * @var \TYPO3\Flow\Log\SecurityLoggerInterface
+     * @var \Neos\Flow\Log\SecurityLoggerInterface
      */
     protected $securityLogger;
 
@@ -46,7 +46,7 @@ class InstagramApiClient
      */
     public function initializeObject() {
         if (($this->requestEngine instanceof DependencyProxy
-                && $this->requestEngine->_getClassName() === 'TYPO3\Flow\Http\Client\CurlEngine')
+                && $this->requestEngine->_getClassName() === 'Neos\Flow\Http\Client\CurlEngine')
             || $this->requestEngine instanceof CurlEngine) {
             $this->requestEngine->setOption(CURLOPT_CAINFO, FLOW_PATH_PACKAGES . 'Application/Flowpack.OAuth2.Client/Resources/Private/cacert.pem');
             $this->requestEngine->setOption(CURLOPT_SSL_VERIFYPEER, TRUE);

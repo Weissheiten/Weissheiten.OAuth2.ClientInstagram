@@ -8,18 +8,18 @@ namespace Weissheiten\OAuth2\ClientInstagram\Controller;
  * modification, are not permitted.                                                 *
  *                                                                                  */
 use Doctrine\ORM\Mapping as ORM;
-use TYPO3\Flow\Annotations as Flow;
-use TYPO3\Flow\Error\Message;
-use TYPO3\Flow\Mvc\Exception\InvalidActionNameException;
-use TYPO3\Flow\Persistence\PersistenceManagerInterface;
-use TYPO3\Flow\Security\Authentication\Controller\AbstractAuthenticationController;
-use TYPO3\Flow\Security\Authentication\TokenInterface;
-use TYPO3\Flow\Security\Exception\AuthenticationRequiredException;
+use Neos\Flow\Annotations as Flow;
+use Neos\Error\Messages\Message;
+use Neos\Flow\Mvc\Exception\InvalidActionNameException;
+use Neos\Flow\Persistence\PersistenceManagerInterface;
+use Neos\Flow\Security\Authentication\Controller\AbstractAuthenticationController;
+use Neos\Flow\Security\Authentication\TokenInterface;
+use Neos\Flow\Security\Exception\AuthenticationRequiredException;
 use Flowpack\OAuth2\Client\Exception\InvalidPartyDataException;
 
 use Flowpack\OAuth2\Client\Token\AbstractClientToken;
 use Weissheiten\OAuth2\ClientInstagram\Flow\InstagramFlow;
-use TYPO3\Party\Domain\Service\PartyService;
+use Neos\Party\Domain\Service\PartyService;
 
 /**
  * LoginController controller
@@ -28,7 +28,7 @@ class AuthenticationController extends AbstractAuthenticationController {
 
     /**
      * @Flow\Inject
-     * @var \TYPO3\Flow\I18n\Translator
+     * @var \Neos\Flow\I18n\Translator
      */
     protected $translator;
 
@@ -40,24 +40,24 @@ class AuthenticationController extends AbstractAuthenticationController {
 
     /**
      * @Flow\Inject
-     * @var \TYPO3\Flow\Security\AccountRepository
+     * @var \Neos\Flow\Security\AccountRepository
      */
     protected $accountRepository;
 
     /**
      * @Flow\Inject
-     * @var \TYPO3\Neos\Domain\Repository\UserRepository
+     * @var \Neos\Neos\Domain\Repository\UserRepository
      */
     protected $userRepository;
 
     /**
-     * @var \TYPO3\Flow\Security\Context
+     * @var \Neos\Flow\Security\Context
      * @Flow\Inject
      */
     protected $securityContext;
 
     /**
-     * @var \TYPO3\Neos\Domain\Service\UserService
+     * @var \Neos\Neos\Domain\Service\UserService
      * @Flow\Inject
      */
     protected $userService;
@@ -72,7 +72,7 @@ class AuthenticationController extends AbstractAuthenticationController {
 
     /**
      * @Flow\Inject
-     * @var \TYPO3\Flow\Log\SecurityLoggerInterface
+     * @var \Neos\Flow\Log\SecurityLoggerInterface
      */
     protected $securityLogger;
 
@@ -83,13 +83,13 @@ class AuthenticationController extends AbstractAuthenticationController {
      *
      * Note: It occurred that $this->request->getReferringRequest() threw an exception
      * if the referrer internal arguments stuff is present, but not set (empty). In such a
-     * case TYPO3\Flow\Mvc\Exception\InvalidActionNameException('The action name must not be an empty string.', 1289472991)
+     * case Neos\Flow\Mvc\Exception\InvalidActionNameException('The action name must not be an empty string.', 1289472991)
      * was thrown and the redirect was not possible.
      *
-     * @param \TYPO3\Flow\Mvc\ActionRequest $originalRequest The request that was intercepted by the security framework, NULL if there was none
+     * @param \Neos\Flow\Mvc\ActionRequest $originalRequest The request that was intercepted by the security framework, NULL if there was none
      * @return string
      */
-    protected function onAuthenticationSuccess(\TYPO3\Flow\Mvc\ActionRequest $originalRequest = NULL) {
+    protected function onAuthenticationSuccess(\Neos\Flow\Mvc\ActionRequest $originalRequest = NULL) {
 /*
         // check if there is an unassigned authentication token
         $possibleOAuthTokenAuthenticatedWithoutParty = $this->authenticationFlow->getChargedAuthenticatedTokenHavingNoPartyAttached();
@@ -102,10 +102,10 @@ class AuthenticationController extends AbstractAuthenticationController {
                 // does an account for this Token already exist
                 $instagramAccount = $this->accountRepository->findByAccountIdentifierAndAuthenticationProviderName($userdata['id'],'InstagramOAuth2Provider');
 
-                // \TYPO3\Flow\var_dump($this->accountRepository->findAll()->toArray());
+                // \Neos\Flow\var_dump($this->accountRepository->findAll()->toArray());
 
                 if($instagramAccount===NULL){
-                    $instagramAccount = new \TYPO3\Flow\Security\Account();
+                    $instagramAccount = new \Neos\Flow\Security\Account();
                     $instagramAccount->setAccountIdentifier($userdata['id']);
                     $instagramAccount->setAuthenticationProviderName('InstagramOAuth2Provider');
                     //$this->accountRepository->add($instagramAccount);
@@ -144,7 +144,7 @@ class AuthenticationController extends AbstractAuthenticationController {
             }
         }
 */
-        $this->redirect('index','backend\module','TYPO3.Neos',array('module' => 'management/InstagramMedia'));
+        $this->redirect('index','backend\module','Neos.Neos',array('module' => 'management/InstagramMedia'));
     }
 
     /**

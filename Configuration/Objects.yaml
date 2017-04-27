@@ -2,15 +2,15 @@ Weissheiten\OAuth2\ClientInstagram\Utility\InstagramApiClient:
   properties:
     'requestEngine':
       object:
-        name: 'TYPO3\Flow\Http\Client\CurlEngine'
+        name: 'Neos\Flow\Http\Client\CurlEngine'
     'appSecret':
-      setting: 'TYPO3.Flow.security.authentication.providers.InstagramOAuth2Provider.providerOptions.clientSecret'
+      setting: 'Neos.Flow.security.authentication.providers.InstagramOAuth2Provider.providerOptions.clientSecret'
 
 Weissheiten\OAuth2\ClientInstagram\Endpoint\InstagramTokenEndpoint:
   properties:
     'endpointUri':
-      setting: 'TYPO3.Flow.security.authentication.providers.InstagramOAuth2Provider.providerOptions.tokenEndpointUri'
+      setting: 'Neos.Flow.security.authentication.providers.InstagramOAuth2Provider.providerOptions.tokenEndpointUri'
     'clientIdentifier':
-      setting: 'TYPO3.Flow.security.authentication.providers.InstagramOAuth2Provider.providerOptions.clientIdentifier'
+      setting: 'Neos.Flow.security.authentication.providers.InstagramOAuth2Provider.providerOptions.clientIdentifier'
     'clientSecret':
-      setting: 'TYPO3.Flow.security.authentication.providers.InstagramOAuth2Provider.providerOptions.clientSecret'
+      setting: 'Neos.Flow.security.authentication.providers.InstagramOAuth2Provider.providerOptions.clientSecret'

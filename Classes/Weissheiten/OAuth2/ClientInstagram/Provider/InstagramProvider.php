@@ -8,13 +8,13 @@ namespace Weissheiten\OAuth2\ClientInstagram\Provider;
 use Flowpack\OAuth2\Client\Exception;
 use Flowpack\OAuth2\Client\Token\AbstractClientToken;
 use Flowpack\OAuth2\Client\Provider\AbstractClientProvider;
-use TYPO3\Flow\Annotations as Flow;
-use TYPO3\Flow\Log\SecurityLoggerInterface;
-use TYPO3\Flow\Persistence\PersistenceManagerInterface;
-use TYPO3\Flow\Security\Account;
-use TYPO3\Flow\Security\Authentication\TokenInterface;
-use TYPO3\Flow\Security\Exception\UnsupportedAuthenticationTokenException;
-use TYPO3\Party\Domain\Service\PartyService;
+use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Log\SecurityLoggerInterface;
+use Neos\Flow\Persistence\PersistenceManagerInterface;
+use Neos\Flow\Security\Account;
+use Neos\Flow\Security\Authentication\TokenInterface;
+use Neos\Flow\Security\Exception\UnsupportedAuthenticationTokenException;
+use Neos\Party\Domain\Service\PartyService;
 
 /**
  */
@@ -28,13 +28,13 @@ class InstagramProvider extends AbstractClientProvider {
 
     /**
      * @Flow\Inject
-     * @var \TYPO3\Flow\Security\AccountRepository
+     * @var \Neos\Flow\Security\AccountRepository
      */
     protected $accountRepository;
 
     /**
      * @Flow\Inject
-     * @var \TYPO3\Flow\Security\Context
+     * @var \Neos\Flow\Security\Context
      */
     protected $securityContext;
 
@@ -51,7 +51,7 @@ class InstagramProvider extends AbstractClientProvider {
     protected $partyService;
 
     /**
-     * @var \TYPO3\Neos\Domain\Service\UserService
+     * @var \Neos\Neos\Domain\Service\UserService
      * @Flow\Inject
      */
     protected $userService;
@@ -67,7 +67,7 @@ class InstagramProvider extends AbstractClientProvider {
      * Tries to authenticate the given token. Sets isAuthenticated to TRUE if authentication succeeded.
      *
      * @param TokenInterface $authenticationToken The token to be authenticated
-     * @throws \TYPO3\Flow\Security\Exception\UnsupportedAuthenticationTokenException
+     * @throws \Neos\Flow\Security\Exception\UnsupportedAuthenticationTokenException
      * @return void
      */
     public function authenticate(TokenInterface $authenticationToken)
@@ -100,7 +100,7 @@ class InstagramProvider extends AbstractClientProvider {
         // yet to check if there is an immanent account present.
         $authenticationToken->setAuthenticationStatus(TokenInterface::AUTHENTICATION_SUCCESSFUL);
 
-        /** @var $account \TYPO3\Flow\Security\Account */
+        /** @var $account \Neos\Flow\Security\Account */
         $account = NULL;
         $providerName = $this->name;
         $accountRepository = $this->accountRepository;
@@ -129,7 +129,7 @@ class InstagramProvider extends AbstractClientProvider {
                 $this->persistenceManager->whitelistObject($user);
             }
             else{
-                $this->securityLogger->logException(new Exception("The InstagramProvider was unable to determine the backend user, make sure the configuration Typo3BackendProvider requestPattern matches the Instagram Controller and the authentication strategy is set to 'atLeastOne' Token"));
+                $this->securityLogger->logException(new Exception("The InstagramProvider was unable to determine the backend user, make sure the configuration Neos.Neos:Backend requestPattern matches the Instagram Controller and the authentication strategy is set to 'atLeastOne' Token"));
             }
         }
 

@@ -12,12 +12,12 @@ namespace Weissheiten\OAuth2\ClientInstagram\Endpoint;
 use Flowpack\OAuth2\Client\Exception as OAuth2Exception;
 use Flowpack\Oauth2\Client\Endpoint\AbstractHttpTokenEndpoint;
 use Flowpack\Oauth2\Client\Endpoint\TokenEndpointInterface;
-use TYPO3\Flow\Annotations as Flow;
-use TYPO3\Flow\Http\Request;
-use TYPO3\Flow\Http\Uri;
-use TYPO3\Flow\Log\SecurityLoggerInterface;
+use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Http\Request;
+use Neos\Flow\Http\Uri;
+use Neos\Flow\Log\SecurityLoggerInterface;
 // uses because of having to override the requestAccessToken function
-use TYPO3\Flow\Utility\Arrays;
+use Neos\Utility\Arrays;
 
 class InstagramTokenEndpoint extends AbstractHttpTokenEndpoint implements TokenEndpointInterface {
     /**

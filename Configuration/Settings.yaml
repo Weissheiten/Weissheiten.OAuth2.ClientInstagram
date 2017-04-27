@@ -1,20 +1,24 @@
-TYPO3:
+
+Neos:
   Flow:
     security:
       authentication:
         providers:
-          Typo3BackendProvider:
+          'Neos.Neos:Backend':
             requestPatterns:
-              controllerObjectName: 'TYPO3\Neos\Controller\.*|TYPO3\Neos\Service\.*|TYPO3\Media\Controller\.*|Weissheiten\OAuth2\ClientInstagram\Controller\.*|Weissheiten\Neos\InstagramMedia\Controller\.*'
+              'Weissheiten.OAuth2.ClientInstagram:controllerObjectName':
+                pattern: ControllerObjectName
+                patternOptions:
+                  controllerObjectNamePattern: 'Neos\Neos\Controller\.*|Neos\Neos\Service\.*|Neos\Media\Controller\.*|Weissheiten\OAuth2\ClientInstagram\Controller\.*|Weissheiten\Neos\InstagramMedia\Controller\.*'
           InstagramOAuth2Provider:
-            provider: 'Weissheiten\OAuth2\ClientInstagram\Provider\InstagramProvider'
-            entryPoint: 'WebRedirect'
+            provider: Weissheiten\OAuth2\ClientInstagram\Provider\InstagramProvider
+            entryPoint: WebRedirect
             entryPointOptions:
-             routeValues:
-              '@package':    'Weissheiten.Neos.InstagramMedia'
-              '@controller': 'Login'
-              '@action':     'login'
-              '@format':     'html'
+              routeValues:
+                '@package': Weissheiten.Neos.InstagramMedia
+                '@controller': Login
+                '@action': login
+                '@format': html
             providerOptions:
               authorizationEndpointUri: 'https://api.instagram.com/oauth/authorize/'
               redirectionEndpointUri: 'http://dev.neos/neos/authentication/authenticateInstagram'
@@ -27,8 +31,14 @@ TYPO3:
                 - public_content
               display: basic
             requestPatterns:
-              controllerObjectName: 'Weissheiten\Neos\InstagramMedia\Controller\.*|Weissheiten\OAuth2\ClientInstagram\Controller\.*'
+              'Weissheiten.OAuth2.ClientInstagram:controllerObjectName':
+                pattern: ControllerObjectName
+                patternOptions:
+                  controllerObjectNamePattern: 'Weissheiten\Neos\InstagramMedia\Controller\.*|Weissheiten\OAuth2\ClientInstagram\Controller\.*'
           FacebookOAuth2Provider:
             requestPatterns:
-              controllerObjectName: 'Non.Existent.Mapping'
+              'Weissheiten.OAuth2.ClientInstagram:controllerObjectName':
+                pattern: ControllerObjectName
+                patternOptions:
+                  controllerObjectNamePattern: Non.Existent.Mapping
         authenticationStrategy: atLeastOneToken

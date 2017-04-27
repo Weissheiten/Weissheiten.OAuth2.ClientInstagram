@@ -9,20 +9,20 @@ use Flowpack\OAuth2\Client\Exception\InvalidPartyDataException;
 use Flowpack\OAuth2\Client\Token\AbstractClientToken;
 use Flowpack\OAuth2\Client\Flow\AbstractFlow;
 use Flowpack\OAuth2\Client\Flow\FlowInterface;
-use TYPO3\Flow\Annotations as Flow;
-use TYPO3\Flow\Security\Account;
-use TYPO3\Flow\Security\Authentication\TokenInterface;
-use TYPO3\Flow\Security\Policy\PolicyService;
-use TYPO3\Flow\Validation\ValidatorResolver;
-use TYPO3\Party\Domain\Model\ElectronicAddress;
-use TYPO3\Party\Domain\Model\Person;
-use TYPO3\Party\Domain\Model\PersonName;
-use TYPO3\Party\Domain\Repository\PartyRepository;
+use Neos\Flow\Annotations as Flow;
+use Neos\Flow\Security\Account;
+use Neos\Flow\Security\Authentication\TokenInterface;
+use Neos\Flow\Security\Policy\PolicyService;
+use Neos\Flow\Validation\ValidatorResolver;
+use Neos\Party\Domain\Model\ElectronicAddress;
+use Neos\Party\Domain\Model\Person;
+use Neos\Party\Domain\Model\PersonName;
+use Neos\Party\Domain\Repository\PartyRepository;
 
 class InstagramFlow extends AbstractFlow implements FlowInterface{
     /**
      * @Flow\Inject
-     * @var \TYPO3\Flow\Security\AccountRepository
+     * @var \Neos\Flow\Security\AccountRepository
      */
     protected $accountRepository;
     /**
@@ -38,13 +38,13 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
     protected $partyRepository;
 
     /**
-     * @var \TYPO3\Party\Domain\Service\PartyService
+     * @var \Neos\Party\Domain\Service\PartyService
      * @Flow\Inject
      */
     protected $partyService;
 
     /**
-     * @var \TYPO3\Neos\Domain\Service\UserService
+     * @var \Neos\Neos\Domain\Service\UserService
      * @Flow\Inject
      */
     protected $userService;
@@ -72,11 +72,11 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
     protected $tokenForeignAccounts = array();
 
     /**
-     * @return \TYPO3\Flow\Security\Account
+     * @return \Neos\Flow\Security\Account
      */
     public function getInstagramAccountHavingParty(){
        foreach($this->userService->getCurrentUser()->getAccounts() as $account){
-            /* @var $account \TYPO3\Flow\Security\Account */
+            /* @var $account \Neos\Flow\Security\Account */
             if($account->getAuthenticationProviderName()==='InstagramOAuth2Provider'){
                 return $account;
             }
@@ -145,7 +145,7 @@ class InstagramFlow extends AbstractFlow implements FlowInterface{
 
         $electronicAddress->setIdentifier($userData['email']);
         $party->addElectronicAddress($electronicAddress);
-        $partyValidator = $this->validatorResolver->getBaseValidatorConjunction('TYPO3\Party\Domain\Model\Person');
+        $partyValidator = $this->validatorResolver->getBaseValidatorConjunction('Neos\Party\Domain\Model\Person');
         $validationResult = $partyValidator->validate($party);
         if ($validationResult->hasErrors()) {
             throw new InvalidPartyDataException('The created party does not satisfy the requirements', 1384266207);
