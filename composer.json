@@ -9,7 +9,7 @@
     }
   ],
   "require":{
-    "typo3/flow": ">=2.1",
+    "typo3/flow": "~3.3.0",
     "flowpack/oauth2-client": "dev-master"
   },
   "autoload":{
