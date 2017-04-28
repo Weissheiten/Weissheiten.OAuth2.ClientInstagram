@@ -80,9 +80,9 @@ class InstagramProvider extends AbstractClientProvider {
 
         // There is no way to validate the Token or check the scopes at the moment apart from "trying" (and possibly receiving an access denied)
         // we could check the validity of the Token and the scopes here in the future when Instagram provides that
-\Neos\Flow\var_dump($credentials);
+
         // Only check if an access Token is present at this time and do a single test call
-        if(isset($credentials['accessToken']) && $credentials['accessToken']!==NULL){
+        //if(isset($credentials['accessToken']) && $credentials['accessToken']!==NULL){
             // check if a secure request is possible (https://www.instagram.com/developer/secure-api-requests/)
             $userInfo = $this->instagramTokenEndpoint->validateSecureRequestCapability($credentials['accessToken']);
 
@@ -91,10 +91,10 @@ class InstagramProvider extends AbstractClientProvider {
                 $this->securityLogger->log('A secure call to the API with the provided accessToken and clientSecret was not possible', LOG_NOTICE);
                 return FALSE;
             }
-        }
-        else{
+        //}
+        //else{
 
-        }
+        //}
 
         // From here, we surely know the user is considered authenticated against the remote service,
         // yet to check if there is an immanent account present.
@@ -117,7 +117,7 @@ class InstagramProvider extends AbstractClientProvider {
 
         $authenticationToken->setAccount($account);
         // the access token is valid for an "undefined time" according to instagram (so we cannot know when the user needs to log in again)
-        $account->setCredentialsSource($credentials['accessToken']);
+        $account->setCredentialsSource($credentials);
         $this->accountRepository->update($account);
 
         // check if a user is already attached to this account
