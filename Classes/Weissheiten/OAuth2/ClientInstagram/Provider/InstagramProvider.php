@@ -84,7 +84,7 @@ class InstagramProvider extends AbstractClientProvider {
         // Only check if an access Token is present at this time and do a single test call
         //if(isset($credentials['accessToken']) && $credentials['accessToken']!==NULL){
             // check if a secure request is possible (https://www.instagram.com/developer/secure-api-requests/)
-            $userInfo = $this->instagramTokenEndpoint->validateSecureRequestCapability($credentials['accessToken']);
+            $userInfo = $this->instagramTokenEndpoint->validateSecureRequestCapability($credentials);
 
             if($userInfo===FALSE){
                 $authenticationToken->setAuthenticationStatus(TokenInterface::WRONG_CREDENTIALS);
