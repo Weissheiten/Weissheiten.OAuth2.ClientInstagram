@@ -80,7 +80,7 @@ class InstagramProvider extends AbstractClientProvider {
 
         // There is no way to validate the Token or check the scopes at the moment apart from "trying" (and possibly receiving an access denied)
         // we could check the validity of the Token and the scopes here in the future when Instagram provides that
-
+\Neos\Flow\var_dump($credentials);
         // Only check if an access Token is present at this time and do a single test call
         if(isset($credentials['accessToken']) && $credentials['accessToken']!==NULL){
             // check if a secure request is possible (https://www.instagram.com/developer/secure-api-requests/)

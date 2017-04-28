@@ -21,11 +21,11 @@ Neos:
                 '@format': html
             providerOptions:
               authorizationEndpointUri: 'https://api.instagram.com/oauth/authorize/'
-              redirectionEndpointUri: 'http://dev.neos/neos/authentication/authenticateInstagram'
+              redirectionEndpointUri: 'http://dev.neos:32831/neos/authentication/authenticateInstagram'
               tokenEndpointUri: 'https://api.instagram.com/oauth/access_token'
               tokenEndpointClassName: Weissheiten\OAuth2\ClientInstagram\Endpoint\InstagramTokenEndpoint
-              clientIdentifier: '--- clientId ---'
-              clientSecret: '--- clientSecret ---'
+              clientIdentifier: '--- CLIENT ID ---'
+              clientSecret: '--- SECRET ID ---'
               responseType: code
               scopes:
                 - public_content
